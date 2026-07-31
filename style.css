@@ -14,7 +14,7 @@
 }
 
 body {
-  background: url(img/test01.jpg);
+  background: url(test01.jpg);
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-position: center center;
