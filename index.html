@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en"> 
+<head> 
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>HAPPY NEW YEAR 2027</title> 
+  <link rel="icon" type="image/jpeg" href="icon.jpg">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet"> 
+  <link rel="stylesheet" href="style.css"> 
+</head> 
+<body> 
+  <div id="start-overlay">
+    <h2 style="color:white; margin-bottom:30px; font-family:'Poppins';">READY FOR 2027?</h2>
+    <button id="start-btn">START COUNTDOWN</button>
+  </div>
+
+  <canvas id="canvas"></canvas>
+  
+  <div class="wrapper" id="main-wrapper">
+    <div class="wrapper">
+      <a href="test.html" class="author">test</a>
+      <div class="heading"> 
+        <h3>Countdown!!!!!</h3>
+        <br><br>
+        <h1>2027 is coming in . . .</h1>
+      </div> 
+      <div class="countdown"> 
+        <div class="box"> <span class="num" id="day-box">00</span> <span class="text">Days</span> </div> 
+        <div class="box"> <span class="num" id="hr-box">00</span> <span class="text">Hours</span> </div> 
+        <div class="box"> <span class="num" id="min-box">00</span> <span class="text">Minutes</span> </div> 
+        <div class="box"> <span class="num" id="sec-box">00</span> <span class="text">Seconds</span> </div> 
+      </div> 
+    </div>
+  </div>
+
+  <audio id="sound-10min" src="song/audio_10m.wav" preload="auto"></audio>
+  <audio id="sound-5min" src="song/audio_5m.wav" preload="auto"></audio>
+  <audio id="sound-1min" src="song/audio_1m.wav" preload="auto"></audio>
+  <audio id="countdown_10s" src="song/countdown_10s.wav" preload="auto"></audio>
+  
+  <script type="module" src="script.js"></script> 
+</body>
+</html>

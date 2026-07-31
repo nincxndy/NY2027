@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy New Year 2026</title>
+    <link rel="icon" type="image/jpeg" href="icon.jpg">
+    <link rel="stylesheet" href="style2.css"> 
+    <style>
+        /* สไตล์สำหรับกล่องข้อความรหัส */
+        #code-display {
+            display: none; /* ซ่อนไว้ก่อน */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            z-index: 9999;
+        }
+        .code-text {
+            font-size: 3rem;
+            color: #f3d163;
+            text-shadow: 0 0 20px rgba(243, 209, 99, 0.7);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px 40px;
+            border-radius: 15px;
+            border: 2px solid #f3d163;
+        }
+        /* คลาสสำหรับซ่อนอนิเมชั่น */
+        .hidden-content {
+            opacity: 0;
+            transition: opacity 1.5s ease;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="main-animation-container">
+        <div class="feliz">Happy new year</div>
+        <div class="ano_novo">
+          <span>202</span>
+          <span class="seis">6</span>
+          <span class="sete">7</span>
+          <div class="balao"></div>
+        </div>
+        <div class="fogos">
+          <div class="f1"><span><i></i></span><span><i></i></span><span><i></i></span></div>
+          <div class="f2"><span><i></i></span><span><i></i></span><span><i></i></span></div>
+          <div class="f3"><span><i></i></span><span><i></i></span><span><i></i></span></div>
+          <div class="f4"><span><i></i></span><span><i></i></span><span><i></i></span></div>
+        </div>
+    </div>
+
+    <!-- <div id="code-display">
+        <div class="code-text">รหัสคือ:nincandy_hpny2026</div>
+    </div> -->
+
+    <audio id="celebration-sound" src="song/countdown_10s.wav" preload="auto"></audio>
+
+    <script>
+      window.onload = function() {
+        // 1. เล่นเสียงหลังจาก 5 วินาทีตามโค้ดเดิม
+        setTimeout(function() {
+          var sound = document.getElementById("celebration-sound");
+          sound.play().catch(function(error) {
+            console.log("Autoplay blocked");
+          });
+        }, 5000);
+
+        // 2. ตั้งเวลาให้อนิเมชั่นหายไปและโชว์รหัส (ประมาณ 12 วินาทีเพื่อให้พลุเล่นจบก่อน)
+        setTimeout(function() {
+          const container = document.getElementById("main-animation-container");
+          const codeDisplay = document.getElementById("code-display");
+          
+          // ค่อยๆ จางอนิเมชั่นออก
+          container.classList.add("hidden-content");
+          
+          // แสดงรหัสขึ้นมา
+          setTimeout(() => {
+              container.style.display = "none";
+              codeDisplay.style.display = "block";
+              codeDisplay.style.animation = "vem_feliz 1.5s ease-in-out forwards";
+          }, 1500);
+
+        }, 12000); // 12000 มิลลิวินาที = 12 วินาที
+      };
+    </script>
+    <a href="index.html" class="author">black</a>
+</body>
+</html>
