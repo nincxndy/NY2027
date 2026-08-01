@@ -221,3 +221,22 @@ a.author {
   85% { opacity: 1; transform: scale(1); }
   100% { opacity: 0; transform: scale(0.8); }
 }
+
+/* จัด QR Code ให้อยู่มุมขวาบน */
+.qr-code {
+  position: fixed;
+  top: -150px;
+  right: -20px;
+  width: 150px;
+  z-index: 999;     
+  border-radius: 4px;
+}
+
+.up{
+  position: fixed;
+  top: -100px;
+  right: -20px;
+  width: 150px;
+  z-index: 999;     
+  border-radius: 4px;
+}
