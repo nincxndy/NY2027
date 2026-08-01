@@ -1,5 +1,5 @@
-import { db, collection, onSnapshot, query, orderBy } from './firebase-config.js';
-
+import { db } from './firebase-config.js';
+import { collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 let isSoundPlaying = false;
 let dayBox = document.getElementById("day-box");
 let hrBox = document.getElementById("hr-box");
