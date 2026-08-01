@@ -1,4 +1,4 @@
-import { db, collection, onSnapshot } from './firebase-config.js';
+import { db, collection, onSnapshot, query, orderBy } from './firebase-config.js';
 
 let isSoundPlaying = false;
 let dayBox = document.getElementById("day-box");
@@ -21,12 +21,15 @@ const startOverlay = document.getElementById("start-overlay");
 const mainWrapper = document.getElementById("main-wrapper");
 
 let userContributions = [];
+let currentIndex = 0; // ตัวนับลำดับการแสดงผล
 
-// ดึงข้อมูล Real-time จาก Firebase
+// 1. ดึงข้อมูล Real-time จาก Firebase (เรียงจากเก่าไปใหม่ asc)
 function loadWishesFromFirebase() {
   try {
     const wishesRef = collection(db, "wishes");
-    onSnapshot(wishesRef, (snapshot) => {
+    const q = query(wishesRef, orderBy("createdAt", "asc")); // เรียงจากเก่าไปใหม่สุด
+
+    onSnapshot(q, (snapshot) => {
       userContributions = [];
       snapshot.forEach((doc) => {
         userContributions.push(doc.data());
@@ -40,37 +43,47 @@ function loadWishesFromFirebase() {
   }
 }
 
-// สุ่มแสดงผลข้อความ/รูปภาพ พร้อมชื่อผู้ส่ง บนหน้าจอ
-function showRandomContribution() {
+// 2. แสดงผลข้อความ/รูปภาพ สลับซ้าย-ขวา และค้าง 7.5 วินาที
+function displaySequentialContribution() {
   let todayDate = new Date();
   let totalSecondsLeft = Math.floor((endTime - todayDate.getTime()) / 1000);
   if (totalSecondsLeft <= 300) return; 
 
   if (userContributions.length === 0) {
-    setTimeout(showRandomContribution, 3500);
+    setTimeout(displaySequentialContribution, 2000);
     return;
   }
 
-  const randomIndex = Math.floor(Math.random() * userContributions.length);
-  const item = userContributions[randomIndex];
+  // ดึงข้อมูลตามลำดับ currentIndex
+  const item = userContributions[currentIndex % userContributions.length];
+  const itemNumber = currentIndex + 1; // ลำดับที่ 1, 2, 3...
 
   const card = document.createElement('div');
   card.className = 'random-card';
 
-  // 1. แสดงชื่อผู้ส่ง
+  // ตรวจสอบ ลำดับคี่/คู่ เพื่อจัดตำแหน่ง
+  if (itemNumber % 2 !== 0) {
+    // เลขคี่ -> มุมบนซ้าย
+    card.classList.add('pos-top-left');
+  } else {
+    // เลขคู่ -> มุมบนขวา
+    card.classList.add('pos-top-right');
+  }
+
+  // 2.1 แสดงชื่อผู้ส่ง
   const sender = document.createElement('div');
   sender.className = 'card-sender';
-  sender.textContent = `👤 ${item.senderName || ""}`;
+  sender.textContent = `👤 ${item.senderName || "ไม่ระบุชื่อ"}`;
   card.appendChild(sender);
 
-  // 2. แสดงรูปภาพ (ถ้ามี)
+  // 2.2 แสดงรูปภาพ (ถ้ามี)
   if (item.imageUrl && item.imageUrl.trim() !== "") {
     const img = document.createElement('img');
     img.src = item.imageUrl;
     card.appendChild(img);
   }
 
-  // 3. แสดงข้อความ (ถ้ามี)
+  // 2.3 แสดงข้อความ (ถ้ามี)
   if (item.message && item.message.trim() !== "") {
     const text = document.createElement('p');
     text.className = 'card-text';
@@ -78,15 +91,23 @@ function showRandomContribution() {
     card.appendChild(text);
   }
 
-  const maxLeft = Math.max(20, window.innerWidth - 350);
-  const maxTop = Math.max(20, window.innerHeight - 300);
-  card.style.left = `${Math.random() * maxLeft}px`;
-  card.style.top = `${Math.random() * maxTop}px`;
+  // 2.4 เพิ่มหลอดเวลาถอยหลัง (Progress Bar)
+  const progressBar = document.createElement('div');
+  progressBar.className = 'card-progress';
+  card.appendChild(progressBar);
 
   document.body.appendChild(card);
 
-  setTimeout(() => card.remove(), 4500);
-  setTimeout(showRandomContribution, 3500);
+  // ขยับ Index ไปยังคนถัดไป
+  currentIndex++;
+
+  // ค้างภาพไว้ 7.5 วินาที (7500ms) แล้วลบออก จากนั้นแสดงรายการถัดไป
+  setTimeout(() => {
+    card.remove();
+  }, 7500);
+
+  // เรียกทำงานรายการถัดไปหลังจากผ่านไป 7.5 วินาที
+  setTimeout(displaySequentialContribution, 8000); 
 }
 
 // ฟังก์ชันเริ่มการทำงานหลัก
@@ -109,7 +130,7 @@ function startEverything() {
   }
 
   loadWishesFromFirebase();
-  showRandomContribution();
+  displaySequentialContribution();
 }
 
 // ผูก Event ปุ่มกด Start
