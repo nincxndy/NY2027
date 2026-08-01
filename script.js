@@ -6,7 +6,6 @@ let hrBox = document.getElementById("hr-box");
 let minBox = document.getElementById("min-box");
 let secBox = document.getElementById("sec-box");
 
-// ตั้งค่าเวลาสิ้นสุด (ปี 2027)
 let endDate = new Date(2027, 0, 1, 0, 0, 0); 
 let endTime = endDate.getTime();
 
