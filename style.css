@@ -188,19 +188,46 @@ a.author {
   transition: opacity 1s ease;
 }
 
-/* สไตล์สำหรับการ์ดสุ่มแสดงผลบนหน้าจอ */
+/* จัด QR Code ให้อยู่มุมขวา */
+.qr-code {
+  position: fixed;
+  bottom: -150px;
+  right: -20px;
+  width: 120px;
+  z-index: 999;     
+  border-radius: 4px;
+}
+
+/* =========================================================
+   การ์ดแสดงผลข้อความ/รูปภาพ (Random Card System)
+   ========================================================= */
+
 .random-card {
   position: fixed;
   z-index: 100;
   background: rgba(0, 0, 0, 0.75);
   border: 1px solid rgba(243, 209, 99, 0.6);
   backdrop-filter: blur(8px);
-  padding: 12px 16px;
+  padding: 12px 16px 16px 16px;
   border-radius: 12px;
-  max-width: 300px;
+  max-width: 320px;
+  width: 90%;
   box-shadow: 0 0 15px rgba(243, 209, 99, 0.3);
   pointer-events: none;
-  animation: fadeInOut 4.5s ease-in-out forwards;
+  animation: fadeInOut 7.5s ease-in-out forwards;
+  overflow: hidden; /* ป้องกันหลอดเวลาล้นขอบมน */
+}
+
+/* มุมบนซ้าย (ข้อมูลเลขคี่ 1, 3, 5...) */
+.random-card.pos-top-left {
+  top: 20px;
+  left: 20px;
+}
+
+/* มุมบนขวา (ข้อมูลเลขคู่ 2, 4, 6...) */
+.random-card.pos-top-right {
+  top: 20px;
+  right: 20px;
 }
 
 .random-card .card-sender {
@@ -212,10 +239,12 @@ a.author {
 
 .random-card img {
   width: 100%;
-  max-height: 180px;
-  object-fit: cover;
+  height: auto;
+  max-height: 350px;
+  object-fit: contain; /* ปรับขนาดภาพตามสัดส่วนจริง ไม่โดนตัด */
   border-radius: 8px;
   margin-bottom: 6px;
+  display: block;
 }
 
 .random-card .card-text {
@@ -225,41 +254,7 @@ a.author {
   white-space: pre-line;
 }
 
-@keyframes fadeInOut {
-  0% { opacity: 0; transform: scale(0.8); }
-  15% { opacity: 1; transform: scale(1); }
-  85% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(0.8); }
-}
-
-/* จัด QR Code ให้อยู่มุมขวาบน */
-.qr-code {
-  position: fixed;
-  bottom:-150px;
-  right: -20px;
-  width: 120px;
-  z-index: 999;     
-  border-radius: 4px;
-}
-
-/* ปรับแต่งการ์ดให้รองรับหลอดเวลาด้านล่าง */
-.random-card {
-  position: fixed;
-  z-index: 100;
-  background: rgba(0, 0, 0, 0.75);
-  border: 1px solid rgba(243, 209, 99, 0.6);
-  backdrop-filter: blur(8px);
-  padding: 12px 16px 16px 16px; /* เว้นระยะล่างเล็กน้อย */
-  border-radius: 12px;
-  max-width: 320px;
-  width: 90%;
-  box-shadow: 0 0 15px rgba(243, 209, 99, 0.3);
-  pointer-events: none;
-  animation: fadeInOut 7.5s ease-in-out forwards;
-  overflow: hidden; /* ป้องกันหลอดเวลาล้นขอบมน */
-}
-
-/* หลอดเวลาถอยหลัง */
+/* หลอดเวลาถอยหลัง (Progress Bar) */
 .card-progress {
   position: absolute;
   bottom: 0;
@@ -279,41 +274,6 @@ a.author {
   100% {
     width: 0%;
   }
-}
-/* มุมบนซ้าย (สำหรับข้อมูลเลขคี่ 1, 3, 5...) */
-.random-card.pos-top-left {
-  top: 20px;
-  left: 20px;
-}
-
-/* มุมบนขวา (สำหรับข้อมูลเลขคู่ 2, 4, 6...) */
-.random-card.pos-top-right {
-  top: 20px;
-  right: 20px;
-}
-
-.random-card .card-sender {
-  font-weight: 600;
-  color: #f3d163;
-  font-size: 0.95rem;
-  margin-bottom: 6px;
-}
-
-.random-card img {
-  width: 100%;
-  height: auto;
-  max-height: 350px;
-  object-fit: contain;
-  border-radius: 8px;
-  margin-bottom: 6px;
-  display: block;
-}
-
-.random-card .card-text {
-  color: #ffffff;
-  font-size: 0.85rem;
-  word-wrap: break-word;
-  white-space: pre-line;
 }
 
 /* Animation แสดง ค้าง 7.5 วินาทีแล้วค่อยจางหาย */
