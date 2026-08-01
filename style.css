@@ -25,7 +25,7 @@ body {
   top: 50%;
   left: 50%;
   min-width: 100%;
-  min-height: 100%;
+  min-height: 103.5%;
   width: auto;
   height: auto;
   z-index: -1; /* ส่งลงไปอยู่ชั้นหลังสุด (ใต้ Canvas และ Wrapper) */
