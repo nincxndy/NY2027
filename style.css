@@ -231,12 +231,3 @@ a.author {
   z-index: 999;     
   border-radius: 4px;
 }
-
-.up{
-  position: fixed;
-  top: -100px;
-  right: -20px;
-  width: 150px;
-  z-index: 999;     
-  border-radius: 4px;
-}
