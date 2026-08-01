@@ -14,13 +14,23 @@
 }
 
 body {
-  background: url(https://cdn.discordapp.com/attachments/1496417996531568794/1532857188740108439/test01.jpg?ex=6a6e6000&is=6a6d0e80&hm=6fe60abde8b3192270e191bae52fa68c75ad9a7d550eaf46fb9b5abb3fef9e28&);
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-position: center center;
-  background-size: cover;
   background-color: #000000;
   overflow: hidden;
+  color: var(--color-white);
+}
+
+/* จัดการวิดีโอพื้นหลังให้อยู่ชั้นหลังสุดและเต็มหน้าจอ */
+#bg-video {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -1; /* ส่งลงไปอยู่ชั้นหลังสุด (ใต้ Canvas และ Wrapper) */
+  transform: translate(-50%, -50%);
+  object-fit: cover; /* ครอบตัดให้เต็มสัดส่วนหน้าจอพอดี */
 }
 
 #canvas {
