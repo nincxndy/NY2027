@@ -19,7 +19,6 @@ body {
   color: var(--color-white);
 }
 
-/* จัดการวิดีโอพื้นหลังให้อยู่ชั้นหลังสุดและเต็มหน้าจอ */
 #bg-video {
   position: fixed;
   top: 50%;
@@ -28,9 +27,9 @@ body {
   min-height: 103.5%;
   width: auto;
   height: auto;
-  z-index: -1; /* ส่งลงไปอยู่ชั้นหลังสุด (ใต้ Canvas และ Wrapper) */
+  z-index: -1;
   transform: translate(-50%, -50%);
-  object-fit: cover; /* ครอบตัดให้เต็มสัดส่วนหน้าจอพอดี */
+  object-fit: cover;
 }
 
 #canvas {
