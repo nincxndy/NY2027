@@ -72,7 +72,7 @@ function displaySequentialContribution() {
   // ชื่อผู้ส่ง
   const sender = document.createElement('div');
   sender.className = 'card-sender';
-  sender.textContent = `👤 ${item.senderName || "ไม่ระบุชื่อ"}`;
+  sender.textContent = `👤 ${item.senderName || ""}`;
   card.appendChild(sender);
 
   // หลอดเวลาถอยหลัง
