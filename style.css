@@ -268,7 +268,7 @@ a.author {
   width: 100%;
   background: #f3d163; /* สีทองเข้ากับธีม */
   box-shadow: 0 0 8px rgba(243, 209, 99, 0.8);
-  animation: shrinkProgress 7.5s linear forwards;
+  animation: shrinkProgress 7.3s linear forwards;
 }
 
 /* Animation ลดความกว้างหลอดเวลาจาก 100% เหลือ 0% ใน 7.5 วินาที */
