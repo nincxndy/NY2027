@@ -1,5 +1,6 @@
 import { db } from './firebase-config.js';
 import { collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
 let isSoundPlaying = false;
 let dayBox = document.getElementById("day-box");
 let hrBox = document.getElementById("hr-box");
@@ -20,13 +21,16 @@ const startOverlay = document.getElementById("start-overlay");
 const mainWrapper = document.getElementById("main-wrapper");
 
 let userContributions = [];
-let currentIndex = 0; // ตัวนับลำดับการแสดงผล
+let currentIndex = 0;
 
-// 1. ดึงข้อมูล Real-time จาก Firebase (เรียงจากเก่าไปใหม่ asc)
+let cardTimer = null;
+let nextCardTimer = null;
+
+// 1. ดึงข้อมูล Real-time
 function loadWishesFromFirebase() {
   try {
     const wishesRef = collection(db, "wishes");
-    const q = query(wishesRef, orderBy("createdAt", "asc")); // เรียงจากเก่าไปใหม่สุด
+    const q = query(wishesRef, orderBy("createdAt", "asc"));
 
     onSnapshot(q, (snapshot) => {
       userContributions = [];
@@ -42,7 +46,7 @@ function loadWishesFromFirebase() {
   }
 }
 
-// 2. แสดงผลข้อความ/รูปภาพ สลับซ้าย-ขวา และค้าง 7.5 วินาที
+// 2. แสดงผลข้อความ/รูปภาพ/วิดีโอ
 function displaySequentialContribution() {
   let todayDate = new Date();
   let totalSecondsLeft = Math.floor((endTime - todayDate.getTime()) / 1000);
@@ -53,36 +57,63 @@ function displaySequentialContribution() {
     return;
   }
 
-  // ดึงข้อมูลตามลำดับ currentIndex
   const item = userContributions[currentIndex % userContributions.length];
-  const itemNumber = currentIndex + 1; // ลำดับที่ 1, 2, 3...
+  const itemNumber = currentIndex + 1;
 
   const card = document.createElement('div');
   card.className = 'random-card';
 
-  // ตรวจสอบ ลำดับคี่/คู่ เพื่อจัดตำแหน่ง
   if (itemNumber % 2 !== 0) {
-    // เลขคี่ -> มุมบนซ้าย
     card.classList.add('pos-top-left');
   } else {
-    // เลขคู่ -> มุมบนขวา
     card.classList.add('pos-top-right');
   }
 
-  // 2.1 แสดงชื่อผู้ส่ง
+  // ชื่อผู้ส่ง
   const sender = document.createElement('div');
   sender.className = 'card-sender';
-  sender.textContent = `👤 ${item.senderName || ""}`;
+  sender.textContent = `👤 ${item.senderName || "ไม่ระบุชื่อ"}`;
   card.appendChild(sender);
 
-  // 2.2 แสดงรูปภาพ (ถ้ามี)
-  if (item.imageUrl && item.imageUrl.trim() !== "") {
-    const img = document.createElement('img');
-    img.src = item.imageUrl;
-    card.appendChild(img);
+  // หลอดเวลาถอยหลัง
+  const progressBar = document.createElement('div');
+  progressBar.className = 'card-progress';
+
+  // เวลาเริ่มต้นคงที่สำหรับ รูปภาพ / ข้อความ (7.5 วินาที)
+  let displayDuration = 7.5; 
+
+  const mediaUrl = item.mediaUrl || item.imageUrl;
+  
+  if (mediaUrl && mediaUrl.trim() !== "") {
+    if (item.mediaType === 'video') {
+      const video = document.createElement('video');
+      video.src = mediaUrl;
+      video.autoplay = true;
+      video.loop = false; // เล่นครั้งเดียวตามความยาวคลิป
+      video.muted = true; // เปิด Muted เพื่อให้วิดีโอ Auto-play ได้ชัวร์
+      video.playsInline = true;
+      card.appendChild(video);
+
+      // เมื่อวิดีโอโหลดสตรีมเสร็จ ดึงเวลาจริงของคลิป
+      video.addEventListener('loadedmetadata', () => {
+        if (video.duration && !isNaN(video.duration)) {
+          displayDuration = video.duration; // ปรับเวลาค้างของหน้าจอตามความยาวคลิป
+          
+          card.style.animationDuration = `${displayDuration}s`;
+          progressBar.style.animationDuration = `${displayDuration}s`;
+
+          scheduleNextCard(card, displayDuration);
+        }
+      });
+
+    } else {
+      const img = document.createElement('img');
+      img.src = mediaUrl;
+      card.appendChild(img);
+    }
   }
 
-  // 2.3 แสดงข้อความ (ถ้ามี)
+  // ข้อความอวยพร
   if (item.message && item.message.trim() !== "") {
     const text = document.createElement('p');
     text.className = 'card-text';
@@ -90,29 +121,38 @@ function displaySequentialContribution() {
     card.appendChild(text);
   }
 
-  // 2.4 เพิ่มหลอดเวลาถอยหลัง (Progress Bar)
-  const progressBar = document.createElement('div');
-  progressBar.className = 'card-progress';
   card.appendChild(progressBar);
-
   document.body.appendChild(card);
 
-  // ขยับ Index ไปยังคนถัดไป
+  card.style.animationDuration = `${displayDuration}s`;
+  progressBar.style.animationDuration = `${displayDuration}s`;
+
   currentIndex++;
 
-  // ค้างภาพไว้ 7.5 วินาที (7500ms) แล้วลบออก จากนั้นแสดงรายการถัดไป
-  setTimeout(() => {
-    card.remove();
-  }, 7500);
-
-  // เรียกทำงานรายการถัดไปหลังจากผ่านไป 7.5 วินาที
-  setTimeout(displaySequentialContribution, 8000); 
+  // ถ้าไม่ใช่คลิปวิดีโอ (หรือวิดีโออ่าน metadata ไม่ทัน) ให้รันสเก็ตดูลแบบปกติ
+  if (!mediaUrl || item.mediaType !== 'video') {
+    scheduleNextCard(card, displayDuration);
+  }
 }
 
-// ฟังก์ชันเริ่มการทำงานหลัก
-function startEverything() {
-  console.log("กำลังเริ่มทำงาน...");
+// ฟังก์ชันนับเวลารอการ์ดถัดไป
+function scheduleNextCard(cardElement, durationSec) {
+  clearTimeout(cardTimer);
+  clearTimeout(nextCardTimer);
 
+  const durationMs = durationSec * 1000;
+
+  cardTimer = setTimeout(() => {
+    if (cardElement && cardElement.parentNode) {
+      cardElement.remove();
+    }
+  }, durationMs);
+
+  nextCardTimer = setTimeout(displaySequentialContribution, durationMs + 500);
+}
+
+// 3. เริ่มต้นระบบทั้งหมด
+function startEverything() {
   if (startOverlay) {
     startOverlay.style.opacity = "0";
     setTimeout(() => {
@@ -132,7 +172,6 @@ function startEverything() {
   displaySequentialContribution();
 }
 
-// ผูก Event ปุ่มกด Start
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("start-btn");
   if (btn) {
@@ -140,12 +179,9 @@ document.addEventListener("DOMContentLoaded", () => {
       e.stopPropagation();
       startEverything();
     });
-  } else {
-    console.error("หาปุ่ม start-btn ไม่เจอ");
   }
 });
 
-// ฟังก์ชันเล่นเสียง
 function playRepeatSound(audioElement) {
   if (!audioElement) return;
   let playCount = 0;
@@ -168,8 +204,7 @@ function playRepeatSound(audioElement) {
 
 function countdown() {
   let todayDate = new Date();
-  let todayTime = todayDate.getTime();
-  let remainingTime = endTime - todayTime;
+  let remainingTime = endTime - todayDate.getTime();
   let totalSecondsLeft = Math.floor(remainingTime / 1000);
 
   if (totalSecondsLeft <= 600 && !alert10) { playRepeatSound(s10m); alert10 = true; }
@@ -195,7 +230,7 @@ function countdown() {
   }
 }
 
-// --- Fireworks Logic ---
+// 4. ระบบพลุสวยงาม (Fireworks Engine)
 window.requestAnimFrame = (function () {
   return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame ||
     function (callback) { window.setTimeout(callback, 1000 / 60); };
